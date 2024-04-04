@@ -1,0 +1,36 @@
+# Inspired by:
+# https://github.com/aws-samples/amazon-cognito-passwordless-auth/blob/main/cdk/custom-auth/magic-link.ts
+
+# Temporary solution while AWS implements this feature:
+# https://github.com/aws-amplify/amplify-js/issues/6676
+
+customSmsSender:
+  handler: src/functions/custom_sms_sender/index.handler
+  environment:
+    KEY_ALIAS: cognito-encryption-key
+    KEY_ARN: arn:aws:kms:${aws:region}:${aws:accountId}:key/${ssm:${sls:stage}-cognito-kms-id}
+    DYNAMODB_TABLE: ${ssm:${sls:stage}-cognito-dynamodb-sms-codes-table-name}
+    SECONDS_UNTIL_EXPIRY: 840
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - kms:Decrypt
+      Resource: "arn:aws:kms:${aws:region}:${aws:accountId}:key/${ssm:${sls:stage}-cognito-kms-id}"
+    # Allow sending SMS over SNS but deny sending anything to SNS topics
+    # https://stackoverflow.com/a/57578229/2067999
+    - Effect: "Allow"
+      Action:
+        - sns:Publish
+      NotResource: "arn:aws:sns:*:*:*"
+    - Effect: "Allow"
+      Action:
+        - dynamodb:UpdateItem
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${ssm:${sls:stage}-cognito-dynamodb-sms-codes-table-name}"
+  events:
+    - cognitoUserPool:
+        pool: ${ssm:${sls:stage}-cognito-patient-pool-name}
+        trigger: CustomSMSSender
+        kmsKeyId: "arn:aws:kms:${aws:region}:${aws:accountId}:key/${ssm:${sls:stage}-cognito-kms-id}"
+        existing: true
+        forceDeploy: true

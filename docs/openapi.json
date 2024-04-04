@@ -1,0 +1,701 @@
+{
+  "openapi": "3.0.3",
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "AuthenticationResult": {
+            "type": "object",
+            "properties": {
+              "AccessToken": {
+                "type": "string"
+              },
+              "ExpiresIn": {
+                "type": "integer"
+              },
+              "IdToken": {
+                "type": "string"
+              },
+              "RefreshToken": {
+                "type": "string"
+              },
+              "TokenType": {
+                "type": "string"
+              }
+            }
+          },
+          "ChallengeParameters": {
+            "type": "object",
+            "properties": {
+              "ChallengeName": {
+                "type": "string"
+              },
+              "ChallengeResult": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "NewPassswordRequiredResponse": {
+        "type": "object",
+        "properties": {
+          "ChallengeName": {
+            "type": "string",
+            "default": "NEW_PASSWORD_REQUIRED"
+          },
+          "ChallengeParameters": {
+            "type": "object",
+            "properties": {
+              "ChallengeName": {
+                "type": "string"
+              },
+              "ChallengeResult": {
+                "type": "boolean"
+              }
+            }
+          },
+          "Session": {
+            "type": "string",
+            "description": "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+          }
+        }
+      },
+      "SMSMFAResponse": {
+        "type": "object",
+        "properties": {
+          "ChallengeName": {
+            "type": "string",
+            "default": "SMS_MFA"
+          },
+          "ChallengeParameters": {
+            "type": "object",
+            "properties": {
+              "CODE_DELIVERY_DESTINATION": {
+                "type": "string",
+                "description": "Masked destination of the SMS MFA code."
+              },
+              "USER_ID_FOR_SRP": {
+                "type": "string"
+              },
+              "CODE_DELIVERY_DELIVERY_MEDIUM": {
+                "type": "string",
+                "default": "SMS"
+              }
+            }
+          },
+          "Session": {
+            "type": "string",
+            "description": "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+          }
+        }
+      },
+      "NotFoundMfaResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "InitiateAuthRequest": {
+        "type": "object",
+        "properties": {
+          "AuthFlow": {
+            "type": "string",
+            "default": "USER_PASSWORD_AUTH"
+          },
+          "AuthParameters": {
+            "type": "object",
+            "properties": {
+              "USERNAME": {
+                "type": "string"
+              },
+              "PASSWORD": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "InitiateAuthRefreshTokenRequest": {
+        "type": "object",
+        "properties": {
+          "AuthFlow": {
+            "type": "string",
+            "default": "REFRESH_TOKEN_AUTH"
+          },
+          "AuthParameters": {
+            "type": "object",
+            "properties": {
+              "USERNAME": {
+                "type": "string"
+              },
+              "REFRESH_TOKEN": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "RespondToAuthChallengeNewPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "ChallengeName": {
+            "type": "string",
+            "default": "NEW_PASSWORD_REQUIRED"
+          },
+          "ChallengeResponses": {
+            "type": "object",
+            "properties": {
+              "USERNAME": {
+                "type": "string"
+              },
+              "NEW_PASSWORD": {
+                "type": "string"
+              }
+            }
+          },
+          "Session": {
+            "type": "string",
+            "description": "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+          }
+        }
+      },
+      "RespondToAuthChallengeSMSMFARequest": {
+        "type": "object",
+        "properties": {
+          "ChallengeName": {
+            "type": "string",
+            "default": "SMS_MFA"
+          },
+          "ChallengeResponses": {
+            "type": "object",
+            "properties": {
+              "USERNAME": {
+                "type": "string"
+              },
+              "SMS_MFA_CODE": {
+                "type": "string"
+              }
+            }
+          },
+          "Session": {
+            "type": "string",
+            "description": "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+          }
+        }
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "Username": {
+            "type": "string"
+          }
+        }
+      },
+      "CodeDeliveryResponse": {
+        "type": "object",
+        "properties": {
+          "CodeDeliveryDetails": {
+            "type": "object",
+            "properties": {
+              "AttributeName": {
+                "type": "string"
+              },
+              "DeliveryMedium": {
+                "type": "string"
+              },
+              "Destination": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ConfirmForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "Username": {
+            "type": "string"
+          },
+          "ConfirmationCode": {
+            "type": "string"
+          },
+          "Password": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendMfaRequest": {
+        "type": "object",
+        "properties": {
+          "Username": {
+            "type": "string"
+          }
+        }
+      },
+      "ResendMfaResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "default": "OK"
+          }
+        }
+      },
+      "ResendMfaRateLimitResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "default": 0
+          },
+          "message": {
+            "type": "string",
+            "default": "Please wait before requesting another code"
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "api-authentication",
+    "description": "API for Cognito authentication",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/auth/initiate-auth": {
+      "post": {
+        "summary": "Initiates sign-in for a user in the Amazon Cognito user directory.",
+        "description": "",
+        "operationId": "api-authentication-staging-initiateAuth",
+        "parameters": [],
+        "tags": [],
+        "externalDocs": {
+          "url": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/InitiateAuthRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/InitiateAuthRefreshTokenRequest"
+                  }
+                ]
+              },
+              "examples": {
+                "Username and Password": {
+                  "value": {
+                    "AuthFlow": "USER_PASSWORD_AUTH",
+                    "AuthParameters": {
+                      "USERNAME": "...",
+                      "PASSWORD": "..."
+                    }
+                  }
+                },
+                "Refresh Token": {
+                  "value": {
+                    "AuthFlow": "REFRESH_TOKEN_AUTH",
+                    "AuthParameters": {
+                      "USERNAME": "...",
+                      "REFRESH_TOKEN": "..."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result of the authentication response. This result is only returned if the caller doesn't need to pass another challenge.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NewPassswordRequiredResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SMSMFAResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Tokens": {
+                    "value": {
+                      "AuthenticationResult": {
+                        "AccessToken": "eyJr...",
+                        "ExpiresIn": 3600,
+                        "IdToken": "eyJr...",
+                        "RefreshToken": "eyJr...",
+                        "TokenType": "Bearer"
+                      },
+                      "ChallengeParameters": {}
+                    }
+                  },
+                  "New Password Required": {
+                    "value": {
+                      "ChallengeName": "NEW_PASSWORD_REQUIRED",
+                      "ChallengeParameters": {
+                        "USER_ID_FOR_SRP": "username",
+                        "userAttributes": "{}",
+                        "requiredAttributes": "[]"
+                      },
+                      "Session": "AYABe..."
+                    }
+                  },
+                  "SMS MFA": {
+                    "value": {
+                      "ChallengeName": "SMS_MFA",
+                      "ChallengeParameters": {
+                        "CODE_DELIVERY_DESTINATION": "+********6693",
+                        "USER_ID_FOR_SRP": "username",
+                        "CODE_DELIVERY_DELIVERY_MEDIUM": "SMS"
+                      },
+                      "Session": "AYABe..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html#API_InitiateAuth_Errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "This exception is thrown when Amazon Cognito or Lambda encounters an internal error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/respond-to-auth-challenge": {
+      "post": {
+        "summary": "Responds to the authentication challenge.",
+        "description": "",
+        "operationId": "api-authentication-staging-respondToAuthChallenge",
+        "parameters": [],
+        "tags": [],
+        "externalDocs": {
+          "url": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_RespondToAuthChallenge.html"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RespondToAuthChallengeNewPasswordRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RespondToAuthChallengeSMSMFARequest"
+                  }
+                ]
+              },
+              "examples": {
+                "New Password": {
+                  "value": {
+                    "ChallengeName": "NEW_PASSWORD_REQUIRED",
+                    "ChallengeResponses": {
+                      "NEW_PASSWORD": "password123",
+                      "USERNAME": "username"
+                    },
+                    "Session": "AYABe..."
+                  }
+                },
+                "SMS MFA": {
+                  "value": {
+                    "ChallengeName": "SMS_MFA",
+                    "ChallengeResponses": {
+                      "SMS_MFA_CODE": "123456",
+                      "USERNAME": "username"
+                    },
+                    "Session": "AYABe..."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The result of the authentication response. This result is only returned if the caller doesn't need to pass another challenge.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SMSMFAResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Tokens": {
+                    "value": {
+                      "AuthenticationResult": {
+                        "AccessToken": "eyJr...",
+                        "ExpiresIn": 3600,
+                        "IdToken": "eyJr...",
+                        "RefreshToken": "eyJr...",
+                        "TokenType": "Bearer"
+                      },
+                      "ChallengeParameters": {}
+                    }
+                  },
+                  "SMS MFA": {
+                    "value": {
+                      "ChallengeName": "SMS_MFA",
+                      "ChallengeParameters": {
+                        "CODE_DELIVERY_DESTINATION": "+********6693",
+                        "USER_ID_FOR_SRP": "username",
+                        "CODE_DELIVERY_DELIVERY_MEDIUM": "SMS"
+                      },
+                      "Session": "AYABe..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_RespondToAuthChallenge.html#API_RespondToAuthChallenge_Errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "This exception is thrown when Amazon Cognito or Lambda encounters an internal error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Calling this API causes a message to be sent to the end user with a confirmation code that is required to change the user's password.",
+        "description": "",
+        "operationId": "api-authentication-staging-forgotPassword",
+        "parameters": [],
+        "tags": [],
+        "externalDocs": {
+          "url": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ForgotPassword.html"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CodeDeliveryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ForgotPassword.html#API_ForgotPassword_Errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "This exception is thrown when Amazon Cognito or Lambda encounters an internal error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/confirm-forgot-password": {
+      "post": {
+        "summary": "Allows a user to enter a confirmation code to reset a forgotten password.",
+        "description": "",
+        "operationId": "api-authentication-staging-confirmForgotPassword",
+        "parameters": [],
+        "tags": [],
+        "externalDocs": {
+          "url": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ConfirmForgotPassword.html"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body.",
+            "content": {}
+          },
+          "400": {
+            "description": "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ConfirmForgotPassword.html#API_ConfirmForgotPassword_Errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "This exception is thrown when Amazon Cognito or Lambda encounters an internal error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/resend-mfa": {
+      "post": {
+        "summary": "Calling this API causes a message to be sent to the end user with a confirmation code that is required to change the user's password.",
+        "description": "",
+        "operationId": "api-authentication-staging-resendMfa",
+        "parameters": [],
+        "tags": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendMfaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendMfaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error when code for user is not found or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundMfaResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Resend request limit exceeded, try again later",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendMfaRateLimitResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "This exception is thrown when Amazon Cognito or Lambda encounters an internal error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.staging.meliovit.com/v1/auth/initiate-auth",
+      "description": "Staging"
+    }
+  ],
+  "externalDocs": {
+    "url": "https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_Operations.html"
+  }
+}

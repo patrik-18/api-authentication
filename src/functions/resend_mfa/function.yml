@@ -1,0 +1,36 @@
+# Hack to be able resend MFA codes, might be implemented by AWS in the future:
+# https://github.com/aws/aws-sdk-js/issues/3488
+# https://github.com/aws-amplify/amplify-js/issues/6676
+
+resendMfa:
+  handler: src/functions/resend_mfa/index.handler
+  environment:
+    KEY_ALIAS: cognito-encryption-key
+    KEY_ARN: arn:aws:kms:${aws:region}:${aws:accountId}:key/${ssm:${sls:stage}-cognito-kms-id}
+    DYNAMODB_TABLE: ${ssm:${sls:stage}-cognito-dynamodb-sms-codes-table-name}
+    USER_POOL_ID: ${ssm:${sls:stage}-cognito-patient-pool-id}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - kms:Decrypt
+      Resource: "arn:aws:kms:${aws:region}:${aws:accountId}:key/${ssm:${sls:stage}-cognito-kms-id}"
+    # Allow sending SMS over SNS but deny sending anything to SNS topics
+    # https://stackoverflow.com/a/57578229/2067999
+    - Effect: "Allow"
+      Action:
+        - sns:Publish
+      NotResource: "arn:aws:sns:*:*:*"
+    - Effect: "Allow"
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+      Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${ssm:${sls:stage}-cognito-dynamodb-sms-codes-table-name}"
+    - Effect: "Allow"
+      Action:
+        - cognito-idp:AdminGetUser
+      Resource: "arn:aws:cognito-idp:${aws:region}:${aws:accountId}:userpool/${ssm:${sls:stage}-cognito-patient-pool-id}"
+  events:
+    - http:
+        path: /auth/resend-mfa
+        method: post
+        # documentation: ${file(docs/serverless.doc.yml):endpoints.resendMfa}

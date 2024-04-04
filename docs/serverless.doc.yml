@@ -1,0 +1,286 @@
+documentation:
+  title: api-authentication
+  description: API for Cognito authentication
+  version: 0.1.0
+  servers:
+    - url: https://api.staging.meliovit.com/v1/
+      description: Staging
+  externalDocumentation:
+    url: https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_Operations.html
+
+  models:
+    - name: "ErrorResponse"
+      description: "The result of the authentication response."
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          status:
+            type: "integer"
+          code:
+            type: "string"
+          message:
+            type: "string"
+    - name: "TokenResponse"
+      description: "The result of the authentication response."
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          AuthenticationResult:
+            type: "object"
+            properties:
+              AccessToken:
+                type: "string"
+              ExpiresIn:
+                type: "integer"
+              IdToken:
+                type: "string"
+              RefreshToken:
+                type: "string"
+              TokenType:
+                type: "string"
+          ChallengeParameters:
+            type: "object"
+            properties:
+              ChallengeName:
+                type: "string"
+              ChallengeResult:
+                type: "boolean"
+    - name: "NewPassswordRequiredResponse"
+      description: "For users who are required to change their passwords after successful first login."
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          ChallengeName:
+            type: "string"
+            default: "NEW_PASSWORD_REQUIRED"
+          ChallengeParameters:
+            type: "object"
+            properties:
+              ChallengeName:
+                type: "string"
+              ChallengeResult:
+                type: "boolean"
+          Session:
+            type: "string"
+            description: "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+    - name: "SMSMFAResponse"
+      description: "User is required enter an MFA code."
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          ChallengeName:
+            type: "string"
+            default: "SMS_MFA"
+          ChallengeParameters:
+            type: "object"
+            properties:
+              CODE_DELIVERY_DESTINATION:
+                type: "string"
+                description: "Masked destination of the SMS MFA code."
+              USER_ID_FOR_SRP:
+                type: "string"
+              CODE_DELIVERY_DELIVERY_MEDIUM:
+                type: "string"
+                default: "SMS"
+          Session:
+            type: "string"
+            description: "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+    - name: "InitiateAuthRequest"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          AuthFlow:
+            type: "string"
+            default: "USER_PASSWORD_AUTH"
+          AuthParameters:
+            type: "object"
+            properties:
+              USERNAME:
+                type: "string"
+              PASSWORD:
+                type: "string"
+    - name: "RespondToAuthChallengeNewPasswordRequest"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          ChallengeName:
+            type: "string"
+            default: "NEW_PASSWORD_REQUIRED"
+          ChallengeResponses:
+            type: "object"
+            properties:
+              USERNAME:
+                type: "string"
+              NEW_PASSWORD:
+                type: "string"
+          Session:
+            type: "string"
+            description: "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+    - name: "RespondToAuthChallengeSMSMFARequest"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          ChallengeName:
+            type: "string"
+            default: "SMS_MFA"
+          ChallengeResponses:
+            type: "object"
+            properties:
+              USERNAME:
+                type: "string"
+              SMS_MFA_CODE:
+                type: "string"
+          Session:
+            type: "string"
+            description: "The session which should be passed both ways in challenge-response calls to the service. If the caller needs to go through another challenge, they pass this with a call to RespondToAuthChallenge along with ChallengeName set to the next challenge, if any."
+    - name: "ForgotPasswordRequest"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          Username:
+            type: "string"
+    - name: "CodeDeliveryResponse"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          CodeDeliveryDetails:
+            type: "object"
+            properties:
+              AttributeName:
+                type: "string"
+              DeliveryMedium:
+                type: "string"
+              Destination:
+                type: "string"
+    - name: "ConfirmForgotPasswordRequest"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          CodeDeliveryDetails:
+            type: "object"
+            properties:
+              Username:
+                type: "string"
+              ConfirmationCode:
+                type: "string"
+              Password:
+                type: "string"
+
+endpoints:
+  initiateAuth:
+    summary: Initiates sign-in for a user in the Amazon Cognito user directory.
+    externalDocumentation:
+      url: https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html
+    requestBody:
+      required: true
+    requestModels:
+      application/json: "InitiateAuthRequest"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: "The result of the authentication response. This result is only returned if the caller doesn't need to pass another challenge."
+        responseModels:
+          application/json: "TokenResponse"
+          # application/json: "NewPassswordRequiredResponse"
+      - statusCode: 400
+        responseBody:
+          description: "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_InitiateAuth.html#API_InitiateAuth_Errors"
+        responseModels:
+          application/json: "ErrorResponse"
+      - statusCode: 500
+        responseBody:
+          description: "This exception is thrown when Amazon Cognito or Lambda encounters an internal error."
+        responseModels:
+          application/json: "ErrorResponse"
+  respondToAuthChallenge:
+    summary: Responds to the authentication challenge.
+    externalDocumentation:
+      url: https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_RespondToAuthChallenge.html
+    requestBody:
+      required: true
+    requestModels:
+      application/json: "RespondToAuthChallengeNewPasswordRequest"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: "The result of the authentication response. This result is only returned if the caller doesn't need to pass another challenge."
+        responseModels:
+          application/json: "TokenResponse"
+      - statusCode: 400
+        responseBody:
+          description: "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_RespondToAuthChallenge.html#API_RespondToAuthChallenge_Errors"
+        responseModels:
+          application/json: "ErrorResponse"
+      - statusCode: 500
+        responseBody:
+          description: "This exception is thrown when Amazon Cognito or Lambda encounters an internal error."
+        responseModels:
+          application/json: "ErrorResponse"
+  forgotPassword:
+    summary: Calling this API causes a message to be sent to the end user with a confirmation code that is required to change the user's password.
+    externalDocumentation:
+      url: https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ForgotPassword.html
+    requestBody:
+      required: true
+    requestModels:
+      application/json: "ForgotPasswordRequest"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: ""
+        responseModels:
+          application/json: "CodeDeliveryResponse"
+      - statusCode: 400
+        responseBody:
+          description: "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ForgotPassword.html#API_ForgotPassword_Errors"
+        responseModels:
+          application/json: "ErrorResponse"
+      - statusCode: 500
+        responseBody:
+          description: "This exception is thrown when Amazon Cognito or Lambda encounters an internal error."
+        responseModels:
+          application/json: "ErrorResponse"
+  confirmForgotPassword:
+    summary: Allows a user to enter a confirmation code to reset a forgotten password.
+    externalDocumentation:
+      url: https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ConfirmForgotPassword.html
+    requestBody:
+      required: true
+    requestModels:
+      application/json: "ConfirmForgotPasswordRequest"
+    methodResponses:
+      - statusCode: 200
+        responseBody:
+          description: "If the action is successful, the service sends back an HTTP 200 response with an empty HTTP body."
+        responseModels:
+          text/plain: ""
+      - statusCode: 400
+        responseBody:
+          description: "Any error from https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ConfirmForgotPassword.html#API_ConfirmForgotPassword_Errors"
+        responseModels:
+          application/json: "ErrorResponse"
+      - statusCode: 500
+        responseBody:
+          description: "This exception is thrown when Amazon Cognito or Lambda encounters an internal error."
+        responseModels:
+          application/json: "ErrorResponse"

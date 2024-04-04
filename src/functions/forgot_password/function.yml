@@ -1,0 +1,11 @@
+forgotPassword:
+  handler: src/functions/forgot_password/index.handler
+  environment:
+    COGNITO_URL: "https://cognito-idp.${aws:region}.amazonaws.com"
+    # TODO: Temporary solution, should be replaced with a API call to /api-tools/user-pool/{device}/{username}
+    COGNITO_CLIENT_ID: ${ssm:${sls:stage}-cognito-mobile-client-id}
+  events:
+    - http:
+        path: /auth/forgot-password
+        method: post
+        documentation: ${file(docs/serverless.doc.yml):endpoints.forgotPassword}

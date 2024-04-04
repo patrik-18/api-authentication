@@ -1,0 +1,50 @@
+service: api-authentication
+frameworkVersion: "3"
+
+useDotenv: true
+
+plugins:
+  - serverless-openapi-documenter
+  - serverless-iam-roles-per-function
+  - serverless-ssm-publish
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'staging'}
+  region: ${opt:region, 'eu-central-1'}
+  runtime: nodejs18.x
+  architecture: arm64
+  memorySize: 256
+  timeout: 10
+  logRetentionInDays: 90
+
+  apiGateway:
+    stage: v1
+    restApiId: ${ssm:${sls:stage}-api-gateway-id}
+    restApiRootResourceId: ${ssm:${sls:stage}-api-gateway-root-resource-id}
+
+custom:
+  stage: ${opt:stage, 'staging'}
+  region: ${opt:region, 'eu-central-1'}
+  documentation: ${file(docs/serverless.doc.yml):documentation}
+
+  ssmPublish:
+    enabled: true
+    params:
+      # Used to trigger TF API GW deploy correctly.
+      - path: ${sls:stage}-api-auth-deploy-time
+        value: ${file(./time.cjs)}
+        secure: false
+
+package:
+  individually: true
+
+functions:
+  - ${file(src/functions/initiate_auth/function.yml)}
+  - ${file(src/functions/respond_to_auth_challenge/function.yml)}
+
+  - ${file(src/functions/forgot_password/function.yml)}
+  - ${file(src/functions/confirm_forgot_password/function.yml)}
+
+  - ${file(src/functions/custom_sms_sender/function.yml)}
+  - ${file(src/functions/resend_mfa/function.yml)}
